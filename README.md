@@ -1,8 +1,8 @@
-# Halcyon · Group Technology · BTRC Immersion
+# Rivanta · Group Technology · BTRC Immersion
 
-Microsoft 365 Copilot show-and-tell built around a morning in the life of the Group CTO of Halcyon General Insurance, preparing for the Q1 Board Technology &amp; Risk Committee.
+Microsoft 365 Copilot show-and-tell built around a morning in the life of the Group CTO of Rivanta General Insurance, preparing for the Q1 Board Technology &amp; Risk Committee.
 
-**Live site:** https://steffiyappy.github.io/halcyon-cto-immersion/
+**Live site:** https://steffiyappy.github.io/rivanta-cto-immersion/
 
 The site is password-gated. Access is shared separately with the audience.
 
@@ -18,7 +18,7 @@ The site is password-gated. Access is shared separately with the audience.
 
 ## Audience
 
-Halcyon's IT department leadership — IT managers through to the Group CTO. Aisha (Group CTO) is the narrative protagonist; the workflows generalise to the whole team's monthly cycle. The format is show-and-tell — the prompts are designed to be demonstrated, not followed along.
+Rivanta's IT department leadership — IT managers through to the Group CTO. Aisha (Group CTO) is the narrative protagonist; the workflows generalise to the whole team's monthly cycle. The format is show-and-tell — the prompts are designed to be demonstrated, not followed along.
 
 ## Disclaimer
 
