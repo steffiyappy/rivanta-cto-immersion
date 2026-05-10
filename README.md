@@ -1,8 +1,8 @@
-# Sentinel · Group Technology · BTRC Immersion
+# Halcyon · Group Technology · BTRC Immersion
 
-Microsoft 365 Copilot show-and-tell built around a morning in the life of the Group CTO of Sentinel General Insurance, preparing for the Q1 Board Technology &amp; Risk Committee.
+Microsoft 365 Copilot show-and-tell built around a morning in the life of the Group CTO of Halcyon General Insurance, preparing for the Q1 Board Technology &amp; Risk Committee.
 
-**Live site:** https://steffiyappy.github.io/sentinel-cto-immersion/
+**Live site:** https://steffiyappy.github.io/halcyon-cto-immersion/
 
 The site is password-gated. Access is shared separately with the audience.
 
