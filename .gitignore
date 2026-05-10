@@ -1,0 +1,6 @@
+_build_*.py
+SESSION_INFO.txt
+.DS_Store
+Thumbs.db
+*.tmp
+~$*

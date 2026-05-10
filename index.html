@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Berjaya Sompo · Group Technology · BTRC Immersion</title>
+<style>
+:root{
+ --navy:#1E3A5F; --blue:#2563EB; --lblue:#3B82F6;
+ --red:#C01B2D; --redd:#A1101F;
+ --ink:#0F172A; --slate:#334155; --mute:#64748B;
+ --bg:#F8FAFC; --card:#FFFFFF; --line:#E2E8F0; --soft:#F1F5F9;
+ --warn:#F97316; --warnbg:#FFF7ED;
+ --good:#16A34A; --goodbg:#ECFDF5;
+ --gold:#B45309; --goldbg:#FEF3C7;
+ --shadow:0 1px 3px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+button{font-family:inherit;cursor:pointer;border:0}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* lock screen */
+#lock{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),var(--red));display:flex;align-items:center;justify-content:center;z-index:1000}
+#lock .card{background:#fff;border-radius:14px;padding:40px 36px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-width:420px;width:90%;text-align:center}
+#lock .icon{font-size:48px;margin-bottom:14px}
+#lock h1{font-size:22px;color:var(--ink);margin-bottom:6px}
+#lock p{color:var(--mute);font-size:14px;margin-bottom:20px}
+#lock input{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:8px;font-size:15px;margin-bottom:12px}
+#lock input:focus{outline:0;border-color:var(--blue)}
+#lock button{width:100%;padding:12px;background:var(--navy);color:#fff;border-radius:8px;font-size:15px;font-weight:600}
+#lock button:hover{background:#16294a}
+#lock .err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+
+/* layout */
+#app{display:none;min-height:100vh}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:#0E1B30;color:#fff;padding:24px 0;overflow-y:auto}
+#sidebar .brand{padding:0 22px 18px;border-bottom:1px solid #1f2c44;margin-bottom:14px}
+#sidebar .brand .logo{font-size:13px;font-weight:700;color:#fff;letter-spacing:.5px}
+#sidebar .brand .logo span{color:var(--red)}
+#sidebar .brand .sub{font-size:11px;color:#8e9bb3;margin-top:4px;letter-spacing:.3px;text-transform:uppercase}
+#sidebar nav{padding:0 12px}
+#sidebar nav button{display:flex;align-items:center;gap:10px;width:100%;background:transparent;color:#cbd5e1;padding:10px 12px;border-radius:6px;font-size:14px;text-align:left;margin-bottom:2px}
+#sidebar nav button:hover{background:#1a2944;color:#fff}
+#sidebar nav button.active{background:var(--navy);color:#fff;font-weight:600}
+#sidebar nav .ico{width:18px;text-align:center}
+#sidebar .foot{position:absolute;bottom:18px;left:22px;right:22px;font-size:11px;color:#64748b;border-top:1px solid #1f2c44;padding-top:14px}
+#main{margin-left:260px;padding:36px 44px;max-width:1180px}
+.page{display:none}
+.page.active{display:block}
+h1.title{font-size:30px;margin-bottom:6px;color:var(--ink)}
+p.sub{color:var(--mute);font-size:15px;margin-bottom:26px}
+
+/* generic cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:18px;box-shadow:var(--shadow)}
+.card h2{font-size:18px;margin-bottom:10px;color:var(--ink)}
+.card h3{font-size:15px;margin:14px 0 6px;color:var(--ink)}
+
+.welcome{background:linear-gradient(135deg,var(--navy),#2c4f7d);color:#fff;border:0}
+.welcome h2{color:#fff;font-size:22px;margin-bottom:8px}
+.welcome p{color:#dbe4f1;font-size:14px}
+.welcome .meta{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:13px;color:#bcc8de}
+.welcome .meta b{color:#fff}
+
+/* outcomes */
+.outcomes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:8px}
+.outcome{background:var(--soft);border-radius:8px;padding:14px}
+.outcome .h{font-weight:600;color:var(--navy);margin-bottom:4px;font-size:14px}
+.outcome .b{font-size:13px;color:var(--slate)}
+
+.format{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:8px}
+.format .item{background:var(--soft);border-radius:8px;padding:14px;text-align:center}
+.format .item .ico{font-size:24px;margin-bottom:6px}
+.format .item .h{font-weight:600;color:var(--navy);font-size:13px}
+.format .item .b{font-size:12px;color:var(--mute);margin-top:3px}
+
+/* story */
+.story-hero{background:linear-gradient(135deg,#0E1B30,var(--navy));color:#fff;border-radius:14px;padding:26px 28px;margin-bottom:18px;display:grid;grid-template-columns:120px 1fr;gap:24px;align-items:center}
+.story-hero .ava{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--red),#7a0e1c);display:flex;align-items:center;justify-content:center;font-size:42px}
+.story-hero h2{color:#fff;font-size:22px;margin-bottom:4px}
+.story-hero .role{color:#fbbf24;font-size:13px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}
+.story-hero p{color:#dbe4f1;font-size:14px;margin-bottom:6px}
+.story-hero .meta{margin-top:8px;font-size:12px;color:#bcc8de}
+.story-hero .meta span{margin-right:14px}
+.story-hero .meta b{color:#fff}
+
+.exgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:6px}
+.excard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;box-shadow:var(--shadow)}
+.excard .num{display:inline-block;background:var(--navy);color:#fff;font-weight:700;font-size:12px;padding:3px 9px;border-radius:4px;margin-bottom:8px}
+.excard h3{font-size:15px;margin-bottom:6px;color:var(--ink)}
+.excard p.tag{font-size:12px;color:var(--mute);margin-bottom:10px}
+.excard ul.tasks{list-style:none;padding:0;margin:0}
+.excard ul.tasks li{font-size:13px;color:var(--slate);padding:6px 0;border-top:1px dashed var(--line)}
+.excard ul.tasks li:first-child{border-top:0}
+.excard ul.tasks li b{display:inline-block;font-size:11px;padding:2px 6px;border-radius:3px;margin-right:6px;font-weight:600;letter-spacing:.2px}
+.b-rsh{background:#EEF2FF;color:#3730A3}
+.b-mc{background:#F0F9FF;color:#075985}
+.b-wd{background:#EFF6FF;color:#1D4ED8}
+.b-xl{background:#ECFDF5;color:#065F46}
+.b-an{background:#F0FDF4;color:#14532D}
+.b-pp{background:#FEF3C7;color:#92400E}
+.b-cw{background:#FEE2E2;color:#991B1B}
+.b-ag{background:#F3E8FF;color:#6B21A8}
+
+/* table */
+table{width:100%;border-collapse:collapse;margin:10px 0}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}
+th{background:var(--soft);font-weight:600;color:var(--ink)}
+td.right,th.right{text-align:right}
+
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;padding:10px 0 10px 38px;position:relative;border-top:1px solid var(--line);font-size:14px}
+.steps li:first-child{border-top:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.steps li b{color:var(--ink)}
+
+.tipgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.tipgrid .tip{background:var(--soft);border-radius:8px;padding:14px}
+.tipgrid .tip .h{font-weight:600;color:var(--navy);font-size:13px;margin-bottom:4px}
+.tipgrid .tip .b{font-size:13px;color:var(--slate)}
+
+/* exercise pages */
+.task{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.task .head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.task .head .num{background:var(--navy);color:#fff;font-weight:700;font-size:12px;padding:3px 9px;border-radius:4px}
+.task .head .tool{font-size:11px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:4px;text-transform:uppercase}
+.task h3{font-size:16px;color:var(--ink)}
+.task p.lead{font-size:13px;color:var(--slate);margin:6px 0 10px}
+.task .where{font-size:12px;color:var(--mute);margin-bottom:8px}
+.task .where b{color:var(--ink)}
+.prompt{background:var(--soft);border-left:4px solid var(--blue);border-radius:6px;padding:14px 16px;margin:10px 0;position:relative;font-size:13.5px;color:var(--ink);white-space:pre-wrap;line-height:1.6}
+.prompt b{color:var(--navy)}
+.prompt .copy{position:absolute;top:10px;right:10px;background:var(--navy);color:#fff;font-size:11px;font-weight:600;padding:5px 10px;border-radius:4px}
+.prompt .copy:hover{background:#16294a}
+.prompt .copy.ok{background:var(--good)}
+.prompt ol,.prompt ul{margin:6px 0 6px 22px}
+.prompt li{margin:3px 0}
+
+.note{background:var(--warnbg);border-left:4px solid var(--warn);padding:12px 14px;border-radius:6px;font-size:13px;color:#7c2d12;margin:10px 0}
+.note b{color:#7c2d12}
+.tip{background:var(--goodbg);border-left:4px solid var(--good);padding:12px 14px;border-radius:6px;font-size:13px;color:#14532D;margin:10px 0}
+.tip b{color:#065F46}
+
+/* use cases */
+.uctabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.uctabs button{background:transparent;color:var(--mute);padding:10px 16px;font-size:14px;font-weight:600;border-bottom:3px solid transparent}
+.uctabs button.active{color:var(--navy);border-bottom-color:var(--navy)}
+.uctab{display:none}
+.uctab.active{display:block}
+.ucitem{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.ucitem .h{font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px}
+.ucitem .ctx{font-size:12.5px;color:var(--mute);margin-bottom:8px}
+.gcse{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.gcse span{font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.3px}
+.gc-g{background:#FEE2E2;color:#991B1B}
+.gc-c{background:#DBEAFE;color:#1E40AF}
+.gc-s{background:#D1FAE5;color:#065F46}
+.gc-e{background:#FEF3C7;color:#92400E}
+
+/* tips page */
+.gcse-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:6px}
+.gc-card{background:var(--soft);border-radius:10px;padding:16px;border-top:4px solid}
+.gc-card.gG{border-color:#DC2626}
+.gc-card.gC{border-color:#2563EB}
+.gc-card.gS{border-color:#16A34A}
+.gc-card.gE{border-color:#D97706}
+.gc-card .l{font-size:11px;letter-spacing:.4px;font-weight:700;color:var(--mute);margin-bottom:4px}
+.gc-card .h{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.gc-card .b{font-size:13px;color:var(--slate)}
+
+.lib{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:8px}
+.libcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;box-shadow:var(--shadow)}
+.libcard .h{font-weight:700;color:var(--navy);font-size:14px;margin-bottom:6px}
+.libcard .b{font-size:13px;color:var(--slate)}
+
+@media (max-width:900px){
+ #sidebar{position:relative;width:100%;height:auto;padding:14px 0}
+ #sidebar nav{display:flex;flex-wrap:wrap;gap:4px}
+ #sidebar nav button{width:auto;padding:8px 12px;font-size:13px}
+ #sidebar .foot{display:none}
+ #main{margin-left:0;padding:18px}
+ .story-hero{grid-template-columns:1fr;text-align:center}
+ .story-hero .ava{margin:0 auto}
+}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock">
+ <div class="card">
+  <div class="icon">🛡️</div>
+  <h1>Berjaya Sompo · Group Technology</h1>
+  <p>Board Technology &amp; Risk Committee Immersion · Microsoft 365 Copilot</p>
+  <input id="pw" type="password" placeholder="Enter access password" onkeydown="if(event.key==='Enter')unlock()" />
+  <button onclick="unlock()">Enter</button>
+  <div class="err" id="err">Incorrect password. Please try again.</div>
+ </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+ <aside id="sidebar">
+  <div class="brand">
+   <div class="logo">BERJAYA <span>SOMPO</span></div>
+   <div class="sub">Group Technology · BTRC</div>
+  </div>
+  <nav>
+   <button onclick="show('overview',this)" class="active"><span class="ico">🏠</span>Overview</button>
+   <button onclick="show('story',this)"><span class="ico">📖</span>Your Story</button>
+   <button onclick="show('start',this)"><span class="ico">🚀</span>Get Started</button>
+   <button onclick="show('ex1',this)"><span class="ico">🔍</span>Exercise 1 · Research &amp; Frame</button>
+   <button onclick="show('ex2',this)"><span class="ico">📊</span>Exercise 2 · Budget &amp; Portfolio</button>
+   <button onclick="show('ex3',this)"><span class="ico">📝</span>Exercise 3 · Risk &amp; Briefing Pack</button>
+   <button onclick="show('ex4',this)"><span class="ico">🤖</span>Exercise 4 · IT Policy Agent</button>
+   <button onclick="show('uc',this)"><span class="ico">💡</span>Use Cases</button>
+   <button onclick="show('tips',this)"><span class="ico">🎯</span>Prompting Tips</button>
+  </nav>
+  <div class="foot">© Berjaya Sompo Insurance · Internal demonstration content for Microsoft 365 Copilot immersion. Data and personae are fictional.</div>
+ </aside>
+
+ <main id="main">
+
+ <!-- OVERVIEW -->
+ <section class="page active" id="overview">
+  <h1 class="title">Welcome, CTO</h1>
+  <p class="sub">A guided show-and-tell across Microsoft 365 Copilot — built around a real morning in the life of a Group CTO.</p>
+
+  <div class="card welcome">
+   <h2>Your Q1 BTRC is on Friday morning.</h2>
+   <p>You have one working morning to assemble the entire Board Technology &amp; Risk Committee pack — peer benchmark, IT budget variance, a vendor risk review on the Skylane Cloud renewal, the BTRC slide deck, and a follow-up on last quarter's action items. We will walk through how Microsoft 365 Copilot turns that morning from triage into curation.</p>
+   <div class="meta">
+    <span>👤 <b>Persona:</b> Aisha Tan, Group CTO</span>
+    <span>🏢 <b>Company:</b> Berjaya Sompo Insurance</span>
+    <span>🎯 <b>Goal:</b> BTRC-ready pack by lunch</span>
+    <span>⏱️ <b>Format:</b> Show-and-tell walkthrough</span>
+   </div>
+  </div>
+
+  <div class="card">
+   <h2>What you'll see</h2>
+   <div class="outcomes">
+    <div class="outcome"><div class="h">Research &amp; Reasoning</div><div class="b">Web-grounded peer benchmarks and a multi-model "council" view on top tech risks for Malaysian insurers.</div></div>
+    <div class="outcome"><div class="h">Numbers &amp; Narrative</div><div class="b">Excel Copilot + Analyst Agent turn raw cost-centre data into a board-ready variance commentary.</div></div>
+    <div class="outcome"><div class="h">Drafting at Scale</div><div class="b">Word and PowerPoint Copilot draft a contract risk review and a 6-slide BTRC deck from your own materials.</div></div>
+    <div class="outcome"><div class="h">Delegation</div><div class="b">Cowork dispatches five follow-on tasks — meeting summary, briefing note, email, calendar invite, Teams update — in parallel.</div></div>
+    <div class="outcome"><div class="h">Custom Agents</div><div class="b">Agent Builder produces a self-service IT &amp; Tech Policy advisor grounded in your governance documents.</div></div>
+    <div class="outcome"><div class="h">Tenant-fit Patterns</div><div class="b">Use cases mapped to the everyday work of a Malaysian general insurer — RMiT, cyber, cloud, vendor concentration, AI strategy.</div></div>
+   </div>
+  </div>
+
+  <div class="card">
+   <h2>How this morning is structured</h2>
+   <div class="format">
+    <div class="item"><div class="ico">📖</div><div class="h">Your Story</div><div class="b">Persona &amp; mission</div></div>
+    <div class="item"><div class="ico">🚀</div><div class="h">Get Started</div><div class="b">Files &amp; setup</div></div>
+    <div class="item"><div class="ico">1️⃣</div><div class="h">Research &amp; Frame</div><div class="b">Researcher · Council · Word</div></div>
+    <div class="item"><div class="ico">2️⃣</div><div class="h">Budget &amp; Portfolio</div><div class="b">Excel + Analyst</div></div>
+    <div class="item"><div class="ico">3️⃣</div><div class="h">Risk &amp; Briefing Pack</div><div class="b">Word · PPT · Cowork</div></div>
+    <div class="item"><div class="ico">4️⃣</div><div class="h">IT Policy Agent</div><div class="b">Agent Builder</div></div>
+   </div>
+  </div>
+ </section>
+
+ <!-- STORY -->
+ <section class="page" id="story">
+  <h1 class="title">Your Story</h1>
+  <p class="sub">A morning in the life of the Group CTO of Berjaya Sompo Insurance.</p>
+
+  <div class="story-hero">
+   <div class="ava">👩🏻‍💼</div>
+   <div>
+    <div class="role">Group Chief Technology Officer</div>
+    <h2>Aisha Tan</h2>
+    <p>Twenty-two years across Malaysian financial services — three at Berjaya Sompo. You own the technology agenda for a general insurer with RM 1.4 bn in gross written premium, eight branches, and a broker-led distribution model. You report to the GCEO and chair the Technology Steering Committee.</p>
+    <div class="meta">
+     <span>🏢 <b>Berjaya Sompo Insurance</b></span>
+     <span>👥 <b>~210 IT &amp; Digital staff</b></span>
+     <span>💰 <b>RM 86 M annual tech budget</b></span>
+     <span>📅 <b>BTRC quarterly</b></span>
+    </div>
+   </div>
+  </div>
+
+  <div class="card">
+   <h2>The mission this morning</h2>
+   <p>It is 07:45 on a Friday. The Q1 Board Technology &amp; Risk Committee starts at 14:00. Five outputs are due into the secretariat by 12:30:</p>
+   <ol style="margin:10px 0 10px 22px;font-size:14px;color:var(--slate);line-height:1.8">
+    <li><b>Peer benchmark &amp; CTO briefing note</b> — how Berjaya Sompo's tech posture compares to four named peers, plus a one-page brief for the Chair.</li>
+    <li><b>IT budget variance commentary</b> — explain the YTD overspend on five cost centres and the implication for year-end.</li>
+    <li><b>Skylane Cloud contract risk review</b> — a three-year managed services renewal lands on the agenda; legal flagged five clauses.</li>
+    <li><b>BTRC deck (6 slides) &amp; follow-up communications</b> — chair pre-read, secretariat email, calendar hold for Skylane renegotiation, Teams note to the Steering Committee.</li>
+    <li><b>IT &amp; Tech Policy Advisor agent</b> — a self-service assistant for the Steering Committee grounded in your published policies, so the BTRC stops being a Q&amp;A on policy minutiae.</li>
+   </ol>
+   <p style="margin-top:10px">Before Copilot, this was a two-day exercise across four people. Today, you are doing it solo, before lunch.</p>
+  </div>
+
+  <h2 style="font-size:20px;margin:18px 0 10px;color:var(--ink)">The four exercises</h2>
+  <div class="exgrid">
+
+   <div class="excard">
+    <div class="num">EXERCISE 1</div>
+    <h3>Research &amp; frame the BTRC</h3>
+    <p class="tag">Researcher · Model Council · Word Copilot</p>
+    <ul class="tasks">
+     <li><b class="b-rsh">Researcher</b> Benchmark BSI vs four named Malaysian general-insurance peers on tech posture.</li>
+     <li><b class="b-mc">Council</b> Get a multi-model view on the top five technology risks for a Malaysian insurer in 2026.</li>
+     <li><b class="b-wd">Word</b> Draft a one-page CTO briefing note for the BTRC Chair.</li>
+    </ul>
+   </div>
+
+   <div class="excard">
+    <div class="num">EXERCISE 2</div>
+    <h3>IT budget variance &amp; project portfolio</h3>
+    <p class="tag">Excel Copilot · Analyst Agent</p>
+    <ul class="tasks">
+     <li><b class="b-xl">Excel</b> Build a YTD variance and a forward-looking burn projection from the cost-centre file.</li>
+     <li><b class="b-xl">Excel</b> Produce a BTRC dashboard view — top variances, projects in red, year-end exposure.</li>
+     <li><b class="b-an">Analyst</b> Cross-reference the project portfolio with the persistent overspends to identify the root causes.</li>
+    </ul>
+   </div>
+
+   <div class="excard">
+    <div class="num">EXERCISE 3</div>
+    <h3>Risk review &amp; briefing pack</h3>
+    <p class="tag">Word · PowerPoint · Cowork</p>
+    <ul class="tasks">
+     <li><b class="b-wd">Word</b> Risk-review the Skylane Cloud Solutions managed services contract.</li>
+     <li><b class="b-pp">PPT</b> Generate a 6-slide BTRC deck from your assembled materials.</li>
+     <li><b class="b-cw">Cowork</b> Delegate five follow-on tasks in parallel — meeting summary, briefing note, email, calendar invite, Teams message.</li>
+    </ul>
+   </div>
+
+   <div class="excard">
+    <div class="num">EXERCISE 4</div>
+    <h3>Build an IT &amp; Tech Policy Advisor</h3>
+    <p class="tag">Agent Builder</p>
+    <ul class="tasks">
+     <li><b class="b-ag">Agent</b> Describe the agent in plain English — the policies it knows, who it serves, the tone.</li>
+     <li><b class="b-ag">Agent</b> Configure knowledge — point it at your published Tech Governance Policies document.</li>
+     <li><b class="b-ag">Agent</b> Test &amp; share — ask three real Steering Committee questions, then publish to the team.</li>
+    </ul>
+   </div>
+
+  </div>
+ </section>
+
+ <!-- GET STARTED -->
+ <section class="page" id="start">
+  <h1 class="title">Get Started</h1>
+  <p class="sub">The four working files you'll see referenced through the exercises.</p>
+
+  <div class="card">
+   <h2>Workshop files</h2>
+   <table>
+    <thead><tr><th style="width:36px"></th><th>File</th><th>Used in</th><th>What it is</th></tr></thead>
+    <tbody>
+     <tr><td>📊</td><td><a href="files/01_BerjayaSompo_TechBudgetVariance.xlsx" download>01_BerjayaSompo_TechBudgetVariance.xlsx</a></td><td>Exercise 2</td><td>FY26 monthly P&amp;L for the IT cost centres with budget, actuals and variances.</td></tr>
+     <tr><td>📄</td><td><a href="files/02_BerjayaSompo_VendorContract.docx" download>02_BerjayaSompo_VendorContract.docx</a></td><td>Exercise 3</td><td>Skylane Cloud Solutions managed-services agreement — 14 clauses, 3-year term.</td></tr>
+     <tr><td>📄</td><td><a href="files/03_BerjayaSompo_BTRCMeeting_Transcript.docx" download>03_BerjayaSompo_BTRCMeeting_Transcript.docx</a></td><td>Exercise 3</td><td>Last quarter's BTRC transcript with ten action items still in flight.</td></tr>
+     <tr><td>📄</td><td><a href="files/04_BerjayaSompo_TechGovernancePolicies.docx" download>04_BerjayaSompo_TechGovernancePolicies.docx</a></td><td>Exercise 4</td><td>Published IT &amp; Tech Governance Policies — eight sections plus schedules.</td></tr>
+    </tbody>
+   </table>
+  </div>
+
+  <div class="card">
+   <h2>Before we begin</h2>
+   <ol class="steps">
+    <li><b>Download the four files above</b> and save them into your OneDrive · <i>Documents/BTRC-Q1</i> folder so Copilot can reference them by name.</li>
+    <li><b>Sign in to Microsoft 365</b> with a Copilot-licensed account on the web app or desktop client.</li>
+    <li><b>Open Microsoft 365 Copilot Chat</b> at <a href="https://m365.cloud.microsoft" target="_blank">m365.cloud.microsoft</a> in a fresh browser tab — keep it open through the morning.</li>
+    <li><b>Confirm the Work scope</b> is selected (not Web) so Copilot grounds in your tenant content unless we explicitly switch it.</li>
+   </ol>
+  </div>
+
+  <div class="card">
+   <h2>How to read this guide</h2>
+   <div class="tipgrid">
+    <div class="tip"><div class="h">📋 Copy the prompts</div><div class="b">Every blue prompt block has a Copy button — paste straight into Copilot.</div></div>
+    <div class="tip"><div class="h">📁 Reference files by name</div><div class="b">Use <i>/</i> in Copilot Chat to attach a specific file by name rather than describing it.</div></div>
+    <div class="tip"><div class="h">⚠️ Tenant-level features</div><div class="b">Researcher and Cowork need to be enabled at the tenant level — orange notes flag where this matters.</div></div>
+    <div class="tip"><div class="h">🎯 GCSE</div><div class="b">Goal · Context · Source · Expectation — the four moves that make every prompt sharper.</div></div>
+   </div>
+  </div>
+ </section>
+
+ <!-- EX1 -->
+ <section class="page" id="ex1">
+  <h1 class="title">Exercise 1 · Research &amp; Frame the BTRC</h1>
+  <p class="sub">Use Microsoft 365 Copilot's research and reasoning surfaces to build the situational picture.</p>
+
+  <div class="note"><b>Tenant-level enablement.</b> Researcher and the Model Council are advanced reasoning agents that your Microsoft 365 admin must enable at the tenant level. If you do not see them in your Agent store, ask your tenant administrator to switch them on for your group.</div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 1</span><span class="tool b-rsh">Researcher</span></div>
+   <h3>Benchmark Berjaya Sompo against four Malaysian peers</h3>
+   <p class="lead">You want a defensible peer view to anchor the BTRC opening — RMiT compliance posture, cyber maturity, cloud adoption, AI strategy and IT spend ratios.</p>
+   <div class="where"><b>Where:</b> Microsoft 365 Copilot Chat → Agents → Researcher.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>I am the Group CTO of <b>Berjaya Sompo Insurance</b>, a Malaysian general insurer (RM 1.4 bn GWP, ~210 IT staff). I am preparing the opening situation slide for our Q1 Board Technology &amp; Risk Committee on Friday afternoon.
+
+Benchmark our likely technology posture against four named Malaysian peers: <b>Etiqa General Insurance, Allianz General Malaysia, Tune Protect, and Liberty Insurance Malaysia</b>.
+
+For each peer, give me 4–6 lines covering:
+- Public signals on <b>BNM RMiT compliance maturity</b> (cloud risk, third-party risk, cyber resilience).
+- <b>Cloud adoption pattern</b> (hyperscaler choice, hybrid posture, recent migrations).
+- Any <b>cyber incidents or regulatory actions</b> in the last 24 months.
+- <b>AI / digital initiatives</b> they have publicly signalled.
+- Likely <b>IT spend as a % of GWP</b> if disclosed or estimable.
+
+Then produce a <b>2-paragraph "implications for Berjaya Sompo"</b> conclusion specifically framing where we are likely <b>ahead</b>, where we are likely <b>behind</b>, and the <b>two strategic plays</b> the BTRC should sponsor this year.
+
+Cite every claim. Flag anything you cannot verify with at least one public source.</div>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 2</span><span class="tool b-mc">Model Council</span></div>
+   <h3>Stress-test the top tech risks for a Malaysian insurer</h3>
+   <p class="lead">Get multiple frontier models to deliberate on the same question. Use it as a foil for your own risk register.</p>
+   <div class="where"><b>Where:</b> Microsoft 365 Copilot Chat → Agents → Model Council (or "Compare models").</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>You are advising the <b>CTO of a Malaysian general insurer</b> preparing a Q1 Board Technology &amp; Risk Committee.
+
+Question: <b>What are the top five technology risks a Malaysian general insurer should put in front of its board for 2026, in priority order?</b>
+
+For each risk:
+- Name it in one short phrase.
+- Explain in 3–4 lines why it matters specifically in the <b>Malaysian / BNM RMiT</b> context (not generic).
+- Identify the <b>leading indicator</b> a board should track.
+- Suggest the <b>single mitigating investment</b> the CTO should propose this year.
+
+Have the models deliberate. Where they disagree, surface the disagreement explicitly under a section called <b>"Where the council split"</b>.
+
+Close with a 4-line synthesis I can paste into a slide titled <i>"BTRC Q1 — Top 5 Technology Risks"</i>.</div>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 3</span><span class="tool b-wd">Word Copilot</span></div>
+   <h3>Draft the CTO briefing note for the BTRC Chair</h3>
+   <p class="lead">Turn the research output into a one-page note the Chair can read in the car between meetings.</p>
+   <div class="where"><b>Where:</b> Word for the web → blank document → <i>Draft with Copilot</i>.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Draft a <b>one-page CTO briefing note</b> for the Chair of the Board Technology &amp; Risk Committee at <b>Berjaya Sompo Insurance</b>, ahead of the Q1 BTRC.
+
+Structure:
+1. <b>Headline</b> — one sentence on where we sit going into the meeting.
+2. <b>Where Berjaya Sompo is ahead</b> of peers — 3 bullets.
+3. <b>Where we are exposed</b> — 3 bullets, each with a measurable indicator.
+4. <b>The two strategic plays</b> the CTO is asking the BTRC to sponsor in 2026, with rough capex envelope.
+5. <b>The single decision</b> we need from the Chair before the meeting opens.
+
+Tone: confident, fact-led, no hedging adverbs. Length: under 400 words. Audience: a non-technical Chair who reads dozens of papers a week.
+
+Use the peer benchmark and the council top-5 risks I just produced as the source material.</div>
+  </div>
+ </section>
+
+ <!-- EX2 -->
+ <section class="page" id="ex2">
+  <h1 class="title">Exercise 2 · IT Budget Variance &amp; Project Portfolio</h1>
+  <p class="sub">Excel Copilot for the variance, the Analyst Agent for the harder reasoning underneath it.</p>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 1</span><span class="tool b-xl">Excel Copilot</span></div>
+   <h3>YTD variance and forward burn</h3>
+   <p class="lead">From the FY26 monthly P&amp;L, build the standard variance view and project where each cost centre lands at year-end if the current run-rate continues.</p>
+   <div class="where"><b>Where:</b> open <b>01_BerjayaSompo_TechBudgetVariance.xlsx</b> in Excel for the web → Copilot pane.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Using the <b>Monthly_PnL</b> sheet, do three things in order.
+
+1. Build a <b>YTD variance table</b> by cost centre showing: YTD Budget, YTD Actual, Variance (RM), Variance (%), and a Status column flagged 🔴 if adverse variance &gt; 10%, 🟠 if 5–10%, 🟢 if within 5%.
+
+2. Identify the <b>five cost centres with the largest adverse variance</b>. For each, write a one-line plain-English commentary I can paste into a board slide. No numbers in the commentary that aren't already on the page.
+
+3. Project <b>year-end full-year exposure</b> for each of those five cost centres using the YTD trend, and give me the <b>total group-level overspend</b> if nothing changes.
+
+Format the result so I can drop it into a BTRC slide. Currency in RM. No formulas visible — values only.</div>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 2</span><span class="tool b-xl">Excel Copilot</span></div>
+   <h3>BTRC dashboard view</h3>
+   <p class="lead">Convert the variance into a single BTRC-grade visual.</p>
+   <div class="where"><b>Where:</b> same workbook → new sheet called <b>BTRC_Dashboard</b>.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>On a new sheet called <b>BTRC_Dashboard</b>, produce a board-ready dashboard with three components stacked vertically:
+
+A) A <b>horizontal bar chart</b> of YTD variance by cost centre, sorted from worst adverse to best, with the 10% adverse threshold marked.
+
+B) A <b>summary KPI strip</b> at the top: Total IT Budget YTD, Total Actuals YTD, Group Variance %, Number of cost centres in red, Forecast year-end overspend.
+
+C) A <b>"Top 3 watch items"</b> table — the three cost centres I should personally walk the BTRC through, each with a one-line "what happened" and a one-line "what we're doing about it".
+
+Make it print-friendly to A4 landscape.</div>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 3</span><span class="tool b-an">Analyst Agent</span></div>
+   <h3>Why are these cost centres persistently over budget?</h3>
+   <p class="lead">The Analyst Agent goes beyond Excel Copilot — it reasons across the data and explains itself. Use it for the harder "so what" question.</p>
+   <div class="where"><b>Where:</b> Microsoft 365 Copilot Chat → Agents → Analyst → upload <b>01_BerjayaSompo_TechBudgetVariance.xlsx</b>.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>You are my <b>tech finance analyst</b>. Cross-reference the <b>Monthly_PnL</b> sheet with the <b>ProjectStatus</b> sheet.
+
+Answer in this order:
+
+1. Which cost centres have a <b>persistent</b> adverse variance — adverse in 3 or more of the last 6 months — versus those that just had a single bad month?
+
+2. For each persistent overspender, identify which strategic projects in <b>ProjectStatus</b> are charging into that cost centre, and whether their RAG status, % complete, or any narrative line items hint at the root cause (scope creep, vendor unit-rate increase, RMiT remediation, cyber incident response, etc.).
+
+3. Group the findings under three causes:
+- <b>Demand-driven</b> (volume/scope went up — defensible)
+- <b>Supply-driven</b> (vendor or unit cost went up — challengeable)
+- <b>Run-the-bank</b> (BAU drift — fixable)
+
+4. Tell me the <b>year-end exposure</b> for each cause and the <b>three actions</b> I should table at the BTRC to bring the group back under 5% adverse by Q4. Show your reasoning.</div>
+  </div>
+ </section>
+
+ <!-- EX3 -->
+ <section class="page" id="ex3">
+  <h1 class="title">Exercise 3 · Risk Review &amp; Briefing Pack</h1>
+  <p class="sub">Word, PowerPoint, and Cowork — drafting and delegation in one motion.</p>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 1</span><span class="tool b-wd">Word Copilot</span></div>
+   <h3>Risk-review the Skylane Cloud managed services contract</h3>
+   <p class="lead">Legal flagged the renewal but you want the risk view in your own voice — and grounded against your own governance policies.</p>
+   <div class="where"><b>Where:</b> open <b>02_BerjayaSompo_VendorContract.docx</b> in Word → Copilot pane.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>I am the CTO. Review this <b>Skylane Cloud Solutions managed services contract</b> for risks that the Berjaya Sompo Board Technology &amp; Risk Committee should care about.
+
+Produce your output as a <b>5-row risk table</b> with columns: <i>Clause #, Issue (one line), Risk rating (High/Medium/Low), Quantified exposure if you can, Recommended position</i>.
+
+Specifically check for:
+- <b>Termination &amp; auto-renewal</b> notice periods (our policy is 90 days).
+- <b>Pass-through fees and audit rights</b> on cost increases.
+- <b>Data ownership and rights to derived data</b>.
+- <b>Audit and inspection rights</b> on the supplier (RMiT outsourcing requirement).
+- <b>Liability cap</b> as a multiple of annual fees (our policy is 12 months minimum).
+
+Below the table, write a <b>3-line "CTO recommendation"</b>: do we sign as drafted, sign with conditions, or send back for renegotiation — and what are the deal-breakers.
+
+Match the tone of an internal risk paper, not a legal brief.</div>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 2</span><span class="tool b-pp">PowerPoint Copilot</span></div>
+   <h3>Generate the BTRC deck</h3>
+   <p class="lead">A six-slide pack the Chair can walk through in 15 minutes.</p>
+   <div class="where"><b>Where:</b> PowerPoint for the web → blank deck → <i>Create with Copilot</i>.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Create a <b>6-slide BTRC deck</b> for Berjaya Sompo Insurance, Q1 FY26.
+
+Slide titles, in order:
+1. <b>Where we sit</b> — peer benchmark headline + 3 bullets.
+2. <b>Top 5 technology risks for 2026</b> — from the model-council synthesis.
+3. <b>IT budget at the half — RM 86 M plan vs actuals</b> — variance KPI strip + 3 watch cost centres.
+4. <b>Skylane Cloud renewal — risk view</b> — pull the 5-row risk table from my Word doc into a slide.
+5. <b>The two strategic plays we are asking the BTRC to sponsor</b> — capex envelope per play.
+6. <b>What we need from the Board today</b> — three explicit decisions.
+
+Use a clean corporate look — navy and red accents, no stock imagery, no clip art. Speaker notes on every slide in my voice (first person, declarative). The deck is for an audience of one Chair plus six NEDs; assume technically literate but time-poor.</div>
+  </div>
+
+  <div class="note"><b>Tenant-level enablement.</b> Cowork is an agent that runs follow-on tasks in the background while you keep working. It must be enabled at the tenant level — if you do not see Cowork in your Agent store, your administrator can switch it on.</div>
+
+  <div class="task">
+   <div class="head"><span class="num">TASK 3</span><span class="tool b-cw">Cowork</span></div>
+   <h3>Delegate five follow-on tasks in parallel</h3>
+   <p class="lead">The deck is done. Cowork now picks up the housekeeping in parallel while you grab a coffee.</p>
+   <div class="where"><b>Where:</b> Microsoft 365 Copilot Chat → Agents → Cowork.</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Run these five tasks in parallel and bring me the outputs.
+
+1. <b>Meeting summary</b> — read <b>03_BerjayaSompo_BTRCMeeting_Transcript.docx</b> from last quarter. Produce a 1-page summary: decisions taken, open action items by owner, and which actions are at risk of slipping into Q2.
+
+2. <b>Briefing note for the Chair</b> — distil the Skylane risk review I just finished in Word into a half-page note: the headline risk, the quantified exposure (in RM), and the deal-breaker clause. The Chair will read this in the car.
+
+3. <b>Email to the BTRC secretariat</b> — pre-circulate the deck. Subject line, 4-line body, attachment named explicitly. Cc the COO. Tone: professional, no exclamation marks.
+
+4. <b>Calendar invite for the Skylane renegotiation</b> — Tuesday next week, 14:00–15:30 KL time, in-person at HQ Boardroom 2 if possible. Invitees: Head of Procurement, Head of Legal, Head of Cloud Platform, CFO. Body: 3 bullets on what we'll cover.
+
+5. <b>Teams message to the Tech Steering Committee</b> — short note that BTRC pre-reads are out, the budget conversation will land Tuesday, and that the Skylane renewal is now on hold pending renegotiation. Two paragraphs, no jargon.</div>
+  </div>
+ </section>
+
+ <!-- EX4 -->
+ <section class="page" id="ex4">
+  <h1 class="title">Exercise 4 · IT &amp; Tech Policy Advisor</h1>
+  <p class="sub">Stop being the help desk for your own policies. Build a self-service agent in five minutes.</p>
+
+  <div class="card">
+   <h2>Why this agent</h2>
+   <p>Half of the questions that hit your inbox from project managers, vendors, and steering committee members are policy questions you have already answered in writing. Threshold for capex approval. Single-source procurement rules. Cloud region restrictions. RMiT outsourcing notification windows. The published Tech Governance Policies cover all of it. Building an agent that answers from those policies turns the inbox from a queue into a fallback.</p>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">STEP 1</span><span class="tool b-ag">Describe</span></div>
+   <h3>Describe the agent in plain English</h3>
+   <div class="where"><b>Where:</b> Microsoft 365 Copilot Chat → Create agent (or Copilot Studio Agent Builder).</div>
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Build me an agent called <b>"BSI Tech Policy Advisor"</b>.
+
+It is for project managers, vendor managers, and Tech Steering Committee members at Berjaya Sompo Insurance.
+
+It answers questions about our published <b>IT &amp; Technology Governance Policies</b> — capex approval thresholds, procurement rules, vendor risk requirements, cloud and data residency, change management, cyber baseline, RMiT-aligned outsourcing notifications, and the project assurance gates.
+
+Tone: <b>direct, plain English, no jargon, no hedging</b>. Always cite the section number from the policy document. If a question is not covered by the policies, say so explicitly and route the user to the right human owner.
+
+Greeting: "Hi — I'm the BSI Tech Policy Advisor. I answer from our published IT &amp; Tech Governance Policies. What do you need to check?"</div>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">STEP 2</span><span class="tool b-ag">Configure knowledge</span></div>
+   <h3>Ground the agent in your policy document</h3>
+   <p class="lead">Add the published Tech Governance Policies as the agent's knowledge source.</p>
+   <ol class="steps">
+    <li>In the agent setup pane, open the <b>Knowledge</b> section.</li>
+    <li>Click <b>Add knowledge</b> → <b>SharePoint &amp; OneDrive files</b>.</li>
+    <li>Select <b>04_BerjayaSompo_TechGovernancePolicies.docx</b> from your OneDrive.</li>
+    <li>Set scope to <b>only this file</b> — we want the agent grounded, not creative.</li>
+    <li>Save and wait for indexing to complete.</li>
+   </ol>
+  </div>
+
+  <div class="task">
+   <div class="head"><span class="num">STEP 3</span><span class="tool b-ag">Test &amp; share</span></div>
+   <h3>Three real Steering Committee questions</h3>
+   <p class="lead">Use the test pane on the right of the Agent Builder to put these three prompts in. The third one is deliberately tricky — it spans procurement and vendor risk.</p>
+
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>I have a project requiring <b>RM 350,000 capex</b> over two years for a single piece of infrastructure. <b>Who approves it</b>, what's the <b>paperwork</b>, and how long should I expect the approval to take? Cite the policy section.</div>
+
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>I want to <b>single-source a vendor</b> for a specialist core-system migration tool. The contract value is <b>RM 180,000 over 18 months</b>. Is single-sourcing allowed at this value? What approvals do I need and what evidence must I file? Cite the policy section.</div>
+
+   <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>The vendor I want to onboard is offering a <b>liability cap of 6 months of fees</b> in their standard managed-services contract. Does this comply with our governance policies? If not, what is the minimum acceptable position, and who can approve a deviation? Cite the policy section.</div>
+
+   <p class="lead" style="margin-top:14px">Once you are happy with the answers, click <b>Share</b> in the top right and publish to the Tech Steering Committee group.</p>
+  </div>
+
+  <div class="tip"><b>What just happened.</b> You built, grounded, tested, and published a policy advisor — without writing a single line of code, and without leaving the Microsoft 365 Copilot interface. The same pattern works for the Underwriting Authority Matrix, the Claims Handling Manual, the Information Security Standards — anywhere you have a stable document and recurring questions.</div>
+ </section>
+
+ <!-- USE CASES -->
+ <section class="page" id="uc">
+  <h1 class="title">Use Cases</h1>
+  <p class="sub">Five scenarios across Group Technology and five across Procurement &amp; Vendor — every prompt tagged with the GCSE moves it uses.</p>
+
+  <div class="uctabs">
+   <button class="active" onclick="ucTab('uc-tech',this)">Group Technology</button>
+   <button onclick="ucTab('uc-proc',this)">Procurement &amp; Vendor</button>
+  </div>
+
+  <div class="uctab active" id="uc-tech">
+
+   <div class="ucitem">
+    <div class="h">1 · Monthly tech budget commentary for the GCEO</div>
+    <div class="ctx">Turning the cost-centre run into a board-grade narrative every month, not just at quarter-end.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Write a <b>3-paragraph monthly IT budget commentary</b> for the <b>GCEO of Berjaya Sompo Insurance</b>, using <b>01_BerjayaSompo_TechBudgetVariance.xlsx</b>. Cover: where we sit YTD, the two cost centres I am personally watching, and what changes by next month. Plain English, no IT acronyms, under 250 words.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">2 · Capex business case for a new core insurance platform</div>
+    <div class="ctx">Anchoring the investment story for a 5-year platform replacement.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Draft the <b>executive summary</b> of a <b>capex business case</b> for a new core policy administration platform at <b>Berjaya Sompo Insurance</b>. We are a Malaysian general insurer with RM 1.4 bn GWP. Indicative envelope: RM 110 M over 5 years. Audience: Group Investment Committee. Cover the strategic rationale, the alternative options considered, the headline business case (NPV, payback, capability uplift), the key risks, and the decision asked. Tone: declarative. Length: under 600 words. Use the peer benchmark and the council top-5 risks I produced earlier as supporting context.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">3 · Cyber posture briefing — pre-board</div>
+    <div class="ctx">A CISO-grade brief in CTO voice ahead of the BTRC.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Produce a <b>1-page cyber posture brief</b> for the BTRC of <b>Berjaya Sompo Insurance</b>. Sections: 1) external threat landscape for Malaysian general insurers (last 90 days, cite sources); 2) our current control coverage versus the BNM RMiT minimums; 3) top three open items from internal audit and external pen test; 4) the three things the Board should be reassured about; 5) the one thing the Board should be worried about. Under 500 words. Frame in the voice of the CTO addressing the Chair.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">4 · RMiT self-assessment refresh</div>
+    <div class="ctx">Annual self-assessment letter to BNM — first draft from policy + evidence.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>I need to refresh the <b>annual RMiT self-assessment</b> for <b>Berjaya Sompo Insurance</b>. Use <b>04_BerjayaSompo_TechGovernancePolicies.docx</b> as the policy baseline. For each of the eight policy sections, draft a 4–5 line statement of how our practice meets the BNM RMiT requirement, what the evidence is, and where we have remaining gaps. Output as a structured table I can hand to Risk &amp; Compliance for sign-off.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">5 · AI strategy — the 1-page narrative</div>
+    <div class="ctx">A defensible position before someone else writes one for you.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Draft a <b>one-page AI strategy narrative</b> for <b>Berjaya Sompo Insurance</b>, written by the CTO for the Board. Cover: 1) where AI realistically helps a Malaysian general insurer in the next 18 months (underwriting, claims triage, fraud, customer service, internal productivity); 2) what we will <b>not</b> chase and why; 3) our governance posture (BNM expectations, model risk, data residency); 4) the three concrete pilots we will run this year and the success measures. Plain English, under 500 words, no buzzwords.</div>
+   </div>
+
+  </div>
+
+  <div class="uctab" id="uc-proc">
+
+   <div class="ucitem">
+    <div class="h">1 · Cloud vendor due diligence pack</div>
+    <div class="ctx">Standardising the diligence question set before any cloud RFP closes.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Generate a <b>cloud vendor due diligence questionnaire</b> for <b>Berjaya Sompo Insurance</b> aligned to BNM RMiT outsourcing and cloud requirements. Group questions under: data residency &amp; sovereignty, security architecture, business continuity &amp; exit, sub-contracting transparency, audit rights, regulatory cooperation, financial viability, and ESG. Each question must be answerable as evidence, not as opinion. Output as a numbered table I can paste into our RFP template.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">2 · Vendor renewal strategy — annual review</div>
+    <div class="ctx">A repeatable lens for every renewal that hits the Steering Committee.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Build a <b>vendor renewal review template</b> for <b>Berjaya Sompo Insurance</b>'s Tech Steering Committee. Sections: contract summary at a glance, performance against SLAs, commercial trend (3-year), strategic alignment, RMiT outsourcing rating, exit readiness, and the four-option recommendation (renew as-is / renegotiate / multi-source / replace). Each section in 3–4 lines max. Designed to be filled in for any vendor renewal in under 90 minutes.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">3 · IT spend analysis by category</div>
+    <div class="ctx">A category view across the IT spend base — not just cost centre.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Using <b>01_BerjayaSompo_TechBudgetVariance.xlsx</b>, produce an <b>IT spend analysis</b> grouped by category: cloud &amp; infrastructure, application licensing, professional services, telco, cyber, and people cost. For each category give YTD spend, % of total, year-on-year direction, and the single supplier dependency to watch. Add a 4-line commentary on where the largest concentration risk sits.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">4 · RMiT-aligned outsourcing notification — first draft</div>
+    <div class="ctx">The first cut of a notification letter to BNM, every time.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Draft a first-cut <b>BNM RMiT outsourcing notification letter</b> for a new <b>cloud-hosted core insurance platform</b> we intend to onboard at <b>Berjaya Sompo Insurance</b>. Cover: nature of the arrangement, materiality assessment, due diligence summary, risks identified and mitigations, exit and contingency arrangements, and Board approval status. Length: 2 pages. Tone: regulatory correspondence. Use <b>04_BerjayaSompo_TechGovernancePolicies.docx</b> Section 5 (Vendor &amp; Outsourcing Risk) as the framing reference.</div>
+   </div>
+
+   <div class="ucitem">
+    <div class="h">5 · Tender evaluation — core platform RFP</div>
+    <div class="ctx">A defensible evaluation matrix for the largest tender of the decade.</div>
+    <div class="gcse"><span class="gc-g">Goal</span><span class="gc-c">Context</span><span class="gc-s">Source</span><span class="gc-e">Expectation</span></div>
+    <div class="prompt"><button class="copy" onclick="copyPrompt(this)">Copy</button>Build a <b>tender evaluation matrix</b> for a core insurance platform RFP at <b>Berjaya Sompo Insurance</b>. Weighting: functional fit 30%, technical architecture 20%, vendor viability 10%, implementation track record 15%, total cost of ownership over 7 years 15%, regulatory &amp; RMiT alignment 10%. For each weighted line, list the 3–5 evidence-based scoring sub-criteria. Output as a scorable spreadsheet structure with explicit pass/fail thresholds for the regulatory line.</div>
+   </div>
+
+  </div>
+ </section>
+
+ <!-- TIPS -->
+ <section class="page" id="tips">
+  <h1 class="title">Prompting Tips</h1>
+  <p class="sub">The four moves that make every Copilot prompt sharper — and a small library to copy from.</p>
+
+  <div class="card">
+   <h2>The GCSE framework</h2>
+   <p>Every strong prompt names four things. Skip any one and the response gets vaguer.</p>
+   <div class="gcse-grid">
+    <div class="gc-card gG"><div class="l">G — GOAL</div><div class="h">What you want produced</div><div class="b">Output type, length, format, audience, decision it enables. "A 1-page CTO briefing note" beats "summarise this".</div></div>
+    <div class="gc-card gC"><div class="l">C — CONTEXT</div><div class="h">Who you are and where you sit</div><div class="b">Your role, the company, the meeting, the constraint. Copilot gets specific when you do.</div></div>
+    <div class="gc-card gS"><div class="l">S — SOURCE</div><div class="h">The material to ground in</div><div class="b">Reference files by name with /, name the policy section, paste the data — don't make Copilot guess.</div></div>
+    <div class="gc-card gE"><div class="l">E — EXPECTATION</div><div class="h">The standard to hit</div><div class="b">Tone, voice, format, citations, what to leave out. The most-skipped move.</div></div>
+   </div>
+  </div>
+
+  <div class="card">
+   <h2>Prompt library — copy &amp; adapt</h2>
+   <div class="lib">
+    <div class="libcard"><div class="h">Take a position</div><div class="b">Add "Don't list both sides — give me the position you would defend, and the one assumption it depends on."</div></div>
+    <div class="libcard"><div class="h">Force evidence</div><div class="b">Add "Cite every claim. Mark anything you cannot verify with a public source as <i>[unverified]</i>."</div></div>
+    <div class="libcard"><div class="h">Constrain length</div><div class="b">"Under 400 words", "Exactly 6 bullets", "1-page A4 landscape print-friendly". Be specific.</div></div>
+    <div class="libcard"><div class="h">Match a voice</div><div class="b">"In the voice of the CTO addressing the Chair: declarative, no hedging adverbs, first person."</div></div>
+    <div class="libcard"><div class="h">Demand structure</div><div class="b">"Output as a 5-row table with these exact columns…" beats "give me the risks".</div></div>
+    <div class="libcard"><div class="h">Iterate, don't restart</div><div class="b">Reply "Tighten paragraph 2 — too defensive" or "Re-do row 3, the exposure is wrong" instead of re-prompting from scratch.</div></div>
+   </div>
+  </div>
+ </section>
+
+ </main>
+</div>
+
+<script>
+const HASH = "148e2809cef7334e941101674595c1bcc65acdbb942074af82acc41a962d4ff1";
+const STORAGE_KEY = "bsi_cto_auth";
+
+async function sha256(s){
+ const enc = new TextEncoder().encode(s);
+ const h = await crypto.subtle.digest("SHA-256", enc);
+ return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+async function unlock(){
+ const v = document.getElementById("pw").value || "";
+ const h = await sha256(v);
+ if(h===HASH){
+  sessionStorage.setItem(STORAGE_KEY,"1");
+  document.getElementById("lock").style.display="none";
+  document.getElementById("app").style.display="block";
+ } else {
+  document.getElementById("err").style.display="block";
+ }
+}
+
+function show(id, btn){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("#sidebar nav button").forEach(b=>b.classList.remove("active"));
+ if(btn) btn.classList.add("active");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function ucTab(id, btn){
+ document.querySelectorAll(".uctab").forEach(t=>t.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".uctabs button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+}
+
+function copyPrompt(btn){
+ const p = btn.parentElement.cloneNode(true);
+ p.querySelectorAll("button").forEach(b=>b.remove());
+ p.querySelectorAll("ol, ul").forEach(list=>{
+  const items = Array.from(list.querySelectorAll("li"));
+  const isOL = list.tagName === "OL";
+  const text = items.map((li,i)=> (isOL ? (i+1)+". " : "- ") + li.innerText.trim()).join("\n");
+  list.replaceWith(document.createTextNode("\n"+text+"\n"));
+ });
+ const txt = p.innerText.trim();
+ navigator.clipboard.writeText(txt).then(()=>{
+  const t = btn.innerText;
+  btn.innerText = "Copied ✓";
+  btn.classList.add("ok");
+  setTimeout(()=>{btn.innerText=t; btn.classList.remove("ok");}, 1600);
+ });
+}
+
+if(sessionStorage.getItem(STORAGE_KEY)==="1"){
+ document.getElementById("lock").style.display="none";
+ document.getElementById("app").style.display="block";
+}
+</script>
+</body>
+</html>
