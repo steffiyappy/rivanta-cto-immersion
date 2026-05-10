@@ -18,7 +18,7 @@ The site is password-gated. Access is shared separately with the audience.
 
 ## Audience
 
-CTO and key technology stakeholders. The format is show-and-tell — the prompts are designed to be demonstrated, not followed along.
+Halcyon's IT department leadership — IT managers through to the Group CTO. Aisha (Group CTO) is the narrative protagonist; the workflows generalise to the whole team's monthly cycle. The format is show-and-tell — the prompts are designed to be demonstrated, not followed along.
 
 ## Disclaimer
 
