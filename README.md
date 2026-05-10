@@ -1,8 +1,8 @@
-# Berjaya Sompo · Group Technology · BTRC Immersion
+# Bermaya Sompa · Group Technology · BTRC Immersion
 
-Microsoft 365 Copilot show-and-tell built around a morning in the life of the Group CTO of Berjaya Sompo Insurance, preparing for the Q1 Board Technology &amp; Risk Committee.
+Microsoft 365 Copilot show-and-tell built around a morning in the life of the Group CTO of Bermaya Sompa Insurance, preparing for the Q1 Board Technology &amp; Risk Committee.
 
-**Live site:** https://steffiyappy.github.io/berjayasompo-cto-immersion/
+**Live site:** https://steffiyappy.github.io/BermayaSompa-cto-immersion/
 
 The site is password-gated. Access is shared separately with the audience.
 
