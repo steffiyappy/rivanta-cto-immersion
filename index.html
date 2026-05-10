@@ -27,7 +27,10 @@ a:hover{text-decoration:underline}
 #lock .icon{font-size:48px;margin-bottom:14px}
 #lock h1{font-size:22px;color:var(--ink);margin-bottom:6px}
 #lock p{color:var(--mute);font-size:14px;margin-bottom:20px}
-#lock input{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:8px;font-size:15px;margin-bottom:12px}
+#lock .pw-wrap{position:relative;margin-bottom:12px}
+#lock input{width:100%;padding:12px 44px 12px 14px;border:2px solid var(--line);border-radius:8px;font-size:15px;box-sizing:border-box}
+#lock .pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--slate);font-size:18px;border-radius:6px;padding:0}
+#lock .pw-toggle:hover{background:rgba(0,0,0,0.05);color:var(--navy)}
 #lock input:focus{outline:0;border-color:var(--blue)}
 #lock button{width:100%;padding:12px;background:var(--navy);color:#fff;border-radius:8px;font-size:15px;font-weight:600}
 #lock button:hover{background:#16294a}
@@ -193,7 +196,10 @@ td.right,th.right{text-align:right}
   <div class="icon">🛡️</div>
   <h1>Sentinel · Group Technology</h1>
   <p>Board Technology &amp; Risk Committee Immersion · Microsoft 365 Copilot</p>
-  <input id="pw" type="password" placeholder="Enter access password" onkeydown="if(event.key==='Enter')unlock()" />
+  <div class="pw-wrap">
+   <input id="pw" type="password" placeholder="Enter access password" onkeydown="if(event.key==='Enter')unlock()" />
+   <button type="button" class="pw-toggle" id="pwToggle" onclick="togglePw()" aria-label="Show password" title="Show password">👁</button>
+  </div>
   <button onclick="unlock()">Enter</button>
   <div class="err" id="err">Incorrect password. Please try again.</div>
  </div>
@@ -231,7 +237,7 @@ td.right,th.right{text-align:right}
    <h2>Your Q1 BTRC is on Friday morning.</h2>
    <p>You have one working morning to assemble the entire Board Technology &amp; Risk Committee pack — peer benchmark, IT budget variance, a vendor risk review on the Skylane Cloud renewal, the BTRC slide deck, and a follow-up on last quarter's action items. We will walk through how Microsoft 365 Copilot turns that morning from triage into curation.</p>
    <div class="meta">
-    <span>👤 <b>Persona:</b> Aisha Tan, Group CTO</span>
+    <span>👤 <b>Persona:</b> Aisha, Group CTO</span>
     <span>🏢 <b>Company:</b> Sentinel General Insurance</span>
     <span>🎯 <b>Goal:</b> BTRC-ready pack by lunch</span>
     <span>⏱️ <b>Format:</b> Show-and-tell walkthrough</span>
@@ -272,7 +278,7 @@ td.right,th.right{text-align:right}
    <div class="ava">👩🏻‍💼</div>
    <div>
     <div class="role">Group Chief Technology Officer</div>
-    <h2>Aisha Tan</h2>
+    <h2>Aisha</h2>
     <p>Twenty-two years across Malaysian financial services — three at Sentinel. You own the technology agenda for a general insurer with RM 1.4 bn in gross written premium, eight branches, and a broker-led distribution model. You report to the GCEO and chair the Technology Steering Committee.</p>
     <div class="meta">
      <span>🏢 <b>Sentinel General Insurance</b></span>
@@ -761,6 +767,23 @@ async function sha256(s){
  const enc = new TextEncoder().encode(s);
  const h = await crypto.subtle.digest("SHA-256", enc);
  return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+function togglePw(){
+ const i = document.getElementById("pw");
+ const b = document.getElementById("pwToggle");
+ if(i.type === "password"){
+  i.type = "text";
+  b.textContent = "🙈";
+  b.setAttribute("aria-label","Hide password");
+  b.title = "Hide password";
+ } else {
+  i.type = "password";
+  b.textContent = "👁";
+  b.setAttribute("aria-label","Show password");
+  b.title = "Show password";
+ }
+ i.focus();
 }
 
 async function unlock(){
